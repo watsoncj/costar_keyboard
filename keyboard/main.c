@@ -44,6 +44,8 @@
    is used to keep track of the keycode and type of key. Layouts are
    defined in `KEYBOARD_MODEL_FILE`. */
 struct {uint8_t is_modifier; uint8_t value;} layout[] = KEYBOARD_LAYOUT;
+struct {uint8_t is_modifier; uint8_t value;} fn_layout[] = FN_LAYOUT;
+bool in_fn_layer = false;
 
 /* Each keys bounce status is represented by an 8-bit integer. The
    lowest bit is set to 1 by the polling routine if the key is seen as
@@ -206,9 +208,13 @@ ISR(TIMER0_COMPA_vect) {
 void key_press(uint8_t k) {
   uint8_t i;
   key[k].is_pressed = true;
-  if(layout[k].is_modifier)
+  if(layout[k].is_modifier) {
+    if (layout[k].value == 0x90) {
+      in_fn_layer = true;
+      return;
+    }
     mod_keys |= layout[k].value;
-  else {
+  } else {
     for(i = QUEUE_LENGTH-1; i > 0; i--)
       queue[i] = queue[i-1];
     queue[0] = k;
@@ -222,9 +228,13 @@ void key_press(uint8_t k) {
 void key_release(uint8_t k) {
   uint8_t i;
   key[k].is_pressed = false;
-  if(layout[k].is_modifier)
+  if(layout[k].is_modifier) {
+    if (layout[k].value == 0x90) {
+      in_fn_layer = false;
+      return;
+    }
     mod_keys &= ~layout[k].value;
-  else {
+  } else {
     for(i = 0; i < QUEUE_LENGTH; i++)
       if(queue[i]==k)
         break;
@@ -250,8 +260,13 @@ void key_release(uint8_t k) {
  */
 void send(void) {
   uint8_t i;
-  for(i = 0; i < QUEUE_LENGTH; i++)
-    keyboard_keys[i] = queue[i] != NO_KEY ? layout[queue[i]].value : 0;
+  for(i = 0; i < QUEUE_LENGTH; i++) {
+    if (in_fn_layer) {
+      keyboard_keys[i] = queue[i] != NO_KEY ? fn_layout[queue[i]].value : 0;
+    } else {
+      keyboard_keys[i] = queue[i] != NO_KEY ? layout[queue[i]].value : 0;
+    }
+  }
   keyboard_modifier_keys = mod_keys;
   usb_keyboard_send();
 }

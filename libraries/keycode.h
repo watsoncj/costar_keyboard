@@ -56,6 +56,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define KC_RSFT {true, 0x20}
 #define KC_RALT {true, 0x40}
 #define KC_RGUI {true, 0x80}
+#define KC_FN   {true, 0x90}
 
 #define KC_A    {false, KEY_A}
 #define KC_B    {false, KEY_B}
