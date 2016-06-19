@@ -6,7 +6,7 @@
 ## Keyboard models. Un-comment the options you want.
 
 #MODEL = flake_20130602
-#MODEL = flake_20140521
+MODEL = flake_20140521
 #MODEL = hoof_20131001
 #MODEL = hoof_20150108
 #MODEL = paw_20130602
@@ -15,6 +15,7 @@
 #MODEL = squid_20140518
 
 #LAYOUT = ANSI_ISO_JIS
+LAYOUT = WATSONCJ
 #LAYOUT = DVORAK
 #LAYOUT = TEST_FLAKE
 #LAYOUT = TEST_COLS
